@@ -33,8 +33,11 @@ export const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950 px-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">Financeiro.IA</h1>
+        <div className="text-center mb-8 flex flex-col items-center">
+          <div className="flex items-center gap-3">
+            <img src="/favicon.svg" alt="Financeiro Icon" className="w-10 h-10" />
+            <h1 className="text-4xl font-bold text-indigo-600 dark:text-indigo-400">Financeiro</h1>
+          </div>
           <p className="text-gray-500 mt-2">Sua gestão financeira inteligente</p>
         </div>
 

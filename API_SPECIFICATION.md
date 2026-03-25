@@ -1,4 +1,4 @@
-# Especificação da API - Financeiro IA (Versão Sincronizada com UI)
+# Especificação da API - Financeiro (Versão Sincronizada com UI)
 
 Este documento reflete as necessidades da interface para substituir o LocalStorage pelo Backend.
 

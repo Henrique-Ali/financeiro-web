@@ -1,4 +1,4 @@
-# Perguntas sobre o Projeto Financeiro IA
+# Perguntas sobre o Projeto Financeiro
 
 Responda abaixo de cada pergunta para que possamos detalhar o funcionamento do sistema.
 

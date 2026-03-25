@@ -1,4 +1,4 @@
-# Documentação Técnica da API - Financeiro IA
+# Documentação Técnica da API - Financeiro
 
 Esta documentação detalha todos os endpoints necessários para o funcionamento pleno do frontend.
 **Base URL (AWS):** `https://z6ogy2t70b.execute-api.sa-east-1.amazonaws.com`
