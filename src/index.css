@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* Solução direta para o ícone do calendário */
+::-webkit-calendar-picker-indicator {
+    filter: invert(1) !important;
+    cursor: pointer;
+}
+
+/* Garante que o navegador entenda o suporte a temas escuros */
+:root {
+  color-scheme: light dark;
+}
