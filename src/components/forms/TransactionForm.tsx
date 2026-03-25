@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
-import { useFinance } from '../../contexts/FinanceContext';
+import { useFinance } from '../../contexts/useFinance';
 import type { 
   TransactionType, 
-  PaymentMethod, 
-  Category, 
-  Responsible, 
-  Account, 
-  CreditCard 
+  PaymentMethod 
 } from '../../types';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
@@ -50,7 +46,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSuccess }) =
     if (!responsibleId && responsibles.length > 0) {
       setResponsibleId(responsibles[0].id);
     }
-  }, [accounts, creditCards, categories, responsibles]);
+  }, [accounts, creditCards, categories, responsibles, accountId, cardId, categoryId, responsibleId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +71,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({ onSuccess }) =
       });
 
       onSuccess();
-    } catch (error) {
+    } catch {
       // Error is already logged in context, but we could show a local error message here
     }
   };

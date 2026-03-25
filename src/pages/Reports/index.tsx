@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useFinance } from '../../contexts/FinanceContext';
+import { useFinance } from '../../contexts/useFinance';
 import { Card } from '../../components/ui/Card';
 import { formatCurrency } from '../../utils/format';
 import { 
@@ -14,7 +14,7 @@ import {
   AreaChart,
   Area
 } from 'recharts';
-import { ArrowUpCircle, CreditCard, Calendar } from 'lucide-react';
+import { ArrowUpCircle, CreditCard } from 'lucide-react';
 import { subMonths, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -65,7 +65,7 @@ export const Reports: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" tick={{fontSize: 10}} />
                 <YAxis tick={{fontSize: 10}} />
-                <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                <Tooltip formatter={(v: unknown) => formatCurrency(Number(v) || 0)} />
                 <Legend />
                 <Area type="monotone" dataKey="Entradas" stroke="#10b981" fill="#10b981" fillOpacity={0.1} />
                 <Area type="monotone" dataKey="Saídas" stroke="#f43f5e" fill="#f43f5e" fillOpacity={0.1} />
@@ -89,7 +89,7 @@ export const Reports: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" tick={{fontSize: 10}} />
                 <YAxis tick={{fontSize: 10}} />
-                <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                <Tooltip formatter={(v: unknown) => formatCurrency(Number(v) || 0)} />
                 <Legend />
                 <Bar dataKey="Estimado" fill="#e2e8f0" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="Real" fill="#6366f1" radius={[4, 4, 0, 0]} />

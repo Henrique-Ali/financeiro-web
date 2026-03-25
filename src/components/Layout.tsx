@@ -15,8 +15,8 @@ import {
   X
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { useAuth } from '../contexts/AuthContext';
-import { useFinance } from '../contexts/FinanceContext';
+import { useAuth } from '../contexts/useAuth';
+import { useFinance } from '../contexts/useFinance';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth();

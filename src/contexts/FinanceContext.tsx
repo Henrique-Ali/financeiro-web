@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import type {
   Transaction,
   Account,
@@ -8,55 +8,8 @@ import type {
   FixedExpense,
   Bill,
 } from "../types";
-import { useAuth } from "./AuthContext";
-import { getYear, getMonth } from "date-fns";
-
-interface FinanceContextType {
-  transactions: Transaction[];
-  accounts: Account[];
-  categories: Category[];
-  creditCards: CreditCard[];
-  responsibles: Responsible[];
-  fixedExpenses: FixedExpense[];
-  isLoading: boolean;
-
-  // Actions
-  addTransaction: (transaction: Omit<Transaction, "id">) => Promise<void>;
-  deleteTransaction: (id: string) => Promise<void>;
-
-  addAccount: (account: Omit<Account, "id">) => Promise<void>;
-  deleteAccount: (id: string) => Promise<void>;
-  updateAccountBalance: (id: string, newBalance: number) => void;
-
-  addCategory: (category: Omit<Category, "id">) => Promise<void>;
-  deleteCategory: (id: string) => Promise<void>;
-
-  addCreditCard: (card: Omit<CreditCard, "id">) => Promise<void>;
-  deleteCreditCard: (id: string) => Promise<void>;
-
-  addResponsible: (responsible: Omit<Responsible, "id">) => Promise<void>;
-  deleteResponsible: (id: string) => Promise<void>;
-
-  addFixedExpense: (expense: Omit<FixedExpense, "id">) => Promise<void>;
-  deleteFixedExpense: (id: string) => Promise<void>;
-  payFixedExpense: (
-    expenseId: string,
-    amountPaid: number,
-    date: string,
-  ) => Promise<void>;
-
-  // Helpers
-  getAccountBalance: (accountId: string) => number;
-  getBill: (cardId: string, month: number, year: number) => Bill;
-  payBill: (bill: Bill, accountId: string) => Promise<void>;
-  transferBetweenAccounts: (
-    fromAccountId: string,
-    toAccountId: string,
-    amount: number,
-  ) => Promise<void>;
-}
-
-const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
+import { useAuth } from "./useAuth";
+import { FinanceContext } from "./FinanceContextObject";
 
 export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -70,19 +23,18 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
   const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
   const [responsibles, setResponsibles] = useState<Responsible[]>([]);
   const [fixedExpenses, setFixedExpenses] = useState<FixedExpense[]>([]);
-  const [paidBillIds, setPaidBillIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // --- API Fetchers ---
   const API_BASE_URL = "https://z6ogy2t70b.execute-api.sa-east-1.amazonaws.com";
 
-  const requestWithAuth = async (endpoint: string, options: RequestInit = {}) => {
-    if (!user || !("token" in user)) return null;
+  const requestWithAuth = useCallback(async (endpoint: string, options: RequestInit = {}) => {
+    if (!user || !user.token) return null;
     
     const url = `${API_BASE_URL}${endpoint}`;
     const headers = {
       ...options.headers,
-      Authorization: `Bearer ${(user as any).token}`,
+      Authorization: `Bearer ${user.token}`,
     };
 
     try {
@@ -98,7 +50,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
         try {
           const errorData = await response.json();
           errorMessage = errorData.message || errorMessage;
-        } catch (e) {
+        } catch {
           // Fallback if response is not JSON
         }
         console.error(errorMessage);
@@ -113,67 +65,67 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
         return await response.json();
       }
       return true;
-    } catch (error: any) {
+    } catch (error) {
       console.error(`Request error at ${endpoint}:`, error);
       throw error;
     }
-  };
+  }, [user]);
 
-  const fetchWithAuth = async (endpoint: string) => {
+  const fetchWithAuth = useCallback(async (endpoint: string) => {
     try {
       return await requestWithAuth(endpoint);
-    } catch (error) {
+    } catch {
       return null;
     }
-  };
+  }, [requestWithAuth]);
 
-  const fetchAccounts = async () => {
+  const fetchAccounts = useCallback(async () => {
     const data = await fetchWithAuth("/accounts");
     const sanitized = Array.isArray(data) 
-      ? data.map((acc: any) => ({ ...acc, balance: Number(acc.balance) || 0 }))
+      ? data.map((acc: Account) => ({ ...acc, balance: Number(acc.balance) || 0 }))
       : [];
     setAccounts(sanitized);
-  };
+  }, [fetchWithAuth]);
 
-  const fetchCreditCards = async () => {
+  const fetchCreditCards = useCallback(async () => {
     const data = await fetchWithAuth("/cards");
     const sanitized = Array.isArray(data) 
-      ? data.map((card: any) => ({ ...card, limit: Number(card.limit) || 0 }))
+      ? data.map((card: CreditCard) => ({ ...card, limit: Number(card.limit) || 0 }))
       : [];
     setCreditCards(sanitized);
-  };
+  }, [fetchWithAuth]);
 
-  const fetchResponsibles = async () => {
+  const fetchResponsibles = useCallback(async () => {
     const data = await fetchWithAuth("/responsibles");
     setResponsibles(Array.isArray(data) ? data : []);
-  };
+  }, [fetchWithAuth]);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     const data = await fetchWithAuth("/categories");
     const sanitized = Array.isArray(data) 
-      ? data.map((cat: any) => ({ ...cat, monthlyLimit: Number(cat.monthlyLimit) || 0 }))
+      ? data.map((cat: Category) => ({ ...cat, monthlyLimit: Number(cat.monthlyLimit) || 0 }))
       : [];
     setCategories(sanitized);
-  };
+  }, [fetchWithAuth]);
 
-  const fetchFixedExpenses = async () => {
+  const fetchFixedExpenses = useCallback(async () => {
     const data = await fetchWithAuth("/fixed-expenses");
     const sanitized = Array.isArray(data) 
-      ? data.map((exp: any) => ({ ...exp, amount: Number(exp.amount) || 0 }))
+      ? data.map((exp: FixedExpense) => ({ ...exp, amount: Number(exp.amount) || 0 }))
       : [];
     setFixedExpenses(sanitized);
-  };
+  }, [fetchWithAuth]);
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     const data = await fetchWithAuth("/transactions");
     console.log("Transações recebidas do Backend:", data);
     const sanitized = Array.isArray(data) 
-      ? data.map((t: any) => ({ ...t, amount: Number(t.amount) || 0 }))
+      ? data.map((t: Transaction) => ({ ...t, amount: Number(t.amount) || 0 }))
       : [];
     setTransactions(sanitized);
-  };
+  }, [fetchWithAuth]);
 
-  const loadAllData = async () => {
+  const loadAllData = useCallback(async () => {
     if (!user) return;
     setIsLoading(true);
     try {
@@ -188,7 +140,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, fetchAccounts, fetchCreditCards, fetchResponsibles, fetchCategories, fetchFixedExpenses, fetchTransactions]);
 
   useEffect(() => {
     if (user) {
@@ -200,9 +152,8 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
       setCreditCards([]);
       setResponsibles([]);
       setFixedExpenses([]);
-      setPaidBillIds([]);
     }
-  }, [user]);
+  }, [user, loadAllData]);
 
   // --- Actions ---
 
@@ -508,9 +459,10 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
       await fetchTransactions();
       await fetchAccounts();
       alert("Fatura paga com sucesso!");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error paying bill:", error);
-      alert(error.message || "Erro ao processar pagamento da fatura.");
+      const message = error instanceof Error ? error.message : "Erro ao processar pagamento da fatura.";
+      alert(message);
       throw error;
     }
   };
@@ -548,11 +500,4 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
       {children}
     </FinanceContext.Provider>
   );
-};
-
-export const useFinance = () => {
-  const context = useContext(FinanceContext);
-  if (!context)
-    throw new Error("useFinance must be used within a FinanceProvider");
-  return context;
 };

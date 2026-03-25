@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { useFinance } from '../../contexts/FinanceContext';
+import { useFinance } from '../../contexts/useFinance';
 import { Card } from '../../components/ui/Card';
 import { BillCard } from '../../components/BillCard';
 import { formatCurrency } from '../../utils/format';
@@ -12,12 +12,12 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts';
-import { Wallet, CreditCard, TrendingUp, Plus, AlertTriangle, CalendarCheck, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Wallet, CreditCard, Plus, AlertTriangle, CalendarCheck, AlertCircle } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { TransactionForm } from '../../components/forms/TransactionForm';
 import { Input } from '../../components/ui/Input';
-import type { FixedExpense } from '../../types';
+import type { FixedExpense, Bill, CreditCard as CreditCardType } from '../../types';
 
 export const Dashboard: React.FC = () => {
   const { 
@@ -50,10 +50,10 @@ export const Dashboard: React.FC = () => {
 
   // 2. Bills (First unpaid bill > 0, searching from 6 months ago)
   const bills = useMemo(() => {
-    const activeBills: { card: any, currentBill: any, nextBill: any }[] = [];
+    const activeBills: { card: CreditCardType, currentBill: Bill, nextBill: Bill }[] = [];
     creditCards.forEach(card => {
       // Começamos a procurar 6 meses antes do mês atual
-      let searchDate = new Date(currentYear, currentMonth - 6, 1);
+      const searchDate = new Date(currentYear, currentMonth - 6, 1);
       let foundBill = null;
       let attempts = 0;
 

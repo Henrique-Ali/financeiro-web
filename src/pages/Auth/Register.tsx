@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/useAuth';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
@@ -23,8 +23,8 @@ export const Register: React.FC = () => {
 
     try {
       await register(name, email, password);
-    } catch (err: any) {
-      setError(err.message || 'Erro ao criar conta');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao criar conta');
       setIsLoading(false);
     }
   };
@@ -37,7 +37,7 @@ export const Register: React.FC = () => {
           const API_BASE_URL = "https://z6ogy2t70b.execute-api.sa-east-1.amazonaws.com";
           const headers = {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${(user as any).token}`
+            'Authorization': `Bearer ${user.token}`
           };
 
           // 1. Criar Conta Caixa

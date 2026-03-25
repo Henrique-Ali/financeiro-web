@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/useAuth';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
@@ -23,8 +23,8 @@ export const Login: React.FC = () => {
     try {
       await login(identifier, password);
       navigate('/');
-    } catch (err: any) {
-      setError(err.message || 'Erro ao realizar login');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao realizar login');
     } finally {
       setIsLoading(false);
     }

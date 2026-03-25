@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useFinance } from '../../contexts/FinanceContext';
+import { useFinance } from '../../contexts/useFinance';
 import { Card } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
@@ -32,7 +32,7 @@ export const Settings: React.FC = () => {
 
   const handleAddResponsible = (e: React.FormEvent) => {
     e.preventDefault();
-    addResponsible({ name: resName });
+    addResponsible({ name: resName, isDefault: false });
     setResName('');
   };
 

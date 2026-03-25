@@ -1,22 +1,13 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { useState } from 'react';
 import type { User } from '../types';
+import { AuthContext } from './AuthContextObject';
 
-interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  login: (identifier: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const EXPIRATION_TIME = 12 * 60 * 60 * 1000; // 12 horas em milissegundos
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<(User & { token: string }) | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isInitialized, setIsInitialized] = useState(false);
-
-  const EXPIRATION_TIME = 12 * 60 * 60 * 1000; // 12 horas em milissegundos
 
   // Recupera o usuário do LocalStorage ao iniciar e valida o tempo
   React.useEffect(() => {
@@ -60,7 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error(data.message || 'Usuário ou senha incorretos');
       }
 
-      const authenticatedUser: User & { token: string } = {
+      const authenticatedUser: User = {
         id: data.id,
         name: data.nome,
         email: data.email || identifier,
@@ -76,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         timestamp: Date.now()
       }));
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Login error:', error);
       throw error;
     }
@@ -102,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error(data.message || 'Erro ao criar conta');
       }
 
-      const authenticatedUser: User & { token: string } = {
+      const authenticatedUser: User = {
         id: data.id,
         name: data.nome,
         email: email,
@@ -118,7 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         timestamp: Date.now()
       }));
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Registration error:', error);
       throw error;
     }
@@ -139,12 +130,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 };
