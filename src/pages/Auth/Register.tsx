@@ -12,7 +12,7 @@ export const Register: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { register, user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -34,7 +34,7 @@ export const Register: React.FC = () => {
     const createInitialData = async () => {
       if (user && isAuthenticated && isLoading) {
         try {
-          const API_BASE_URL = "https://z6ogy2t70b.execute-api.sa-east-1.amazonaws.com";
+          const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
           const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${user.token}`
@@ -56,7 +56,7 @@ export const Register: React.FC = () => {
 
           // 3. Criar Categorias Padrão
           const defaultCategories = ['Salário', 'Mercado', 'Aluguel', 'Lazer', 'Outros'];
-          await Promise.all(defaultCategories.map(catName => 
+          await Promise.all(defaultCategories.map(catName =>
             fetch(`${API_BASE_URL}/categories`, {
               method: 'POST',
               headers,
@@ -67,7 +67,7 @@ export const Register: React.FC = () => {
           navigate('/');
         } catch (err) {
           console.error("Erro ao criar dados iniciais:", err);
-          navigate('/'); 
+          navigate('/');
         } finally {
           setIsLoading(false);
         }

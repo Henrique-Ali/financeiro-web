@@ -3,6 +3,7 @@ import type { User } from '../types';
 import { AuthContext } from './AuthContextObject';
 
 const EXPIRATION_TIME = 12 * 60 * 60 * 1000; // 12 horas em milissegundos
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -34,7 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (identifier: string, password: string) => {
     try {
-      const response = await fetch('https://z6ogy2t70b.execute-api.sa-east-1.amazonaws.com/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setUser(authenticatedUser);
       setIsAuthenticated(true);
-      
+
       // Salva usuário e timestamp atual
       localStorage.setItem('financeiro_session', JSON.stringify({
         user: authenticatedUser,
@@ -75,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (name: string, email: string, password: string) => {
     try {
-      const response = await fetch('https://z6ogy2t70b.execute-api.sa-east-1.amazonaws.com/auth/register', {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -102,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setUser(authenticatedUser);
       setIsAuthenticated(true);
-      
+
       // Salva usuário e timestamp atual
       localStorage.setItem('financeiro_session', JSON.stringify({
         user: authenticatedUser,

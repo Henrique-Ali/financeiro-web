@@ -14,7 +14,7 @@ import { FinanceContext } from "./FinanceContextObject";
 export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   // --- States ---
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -26,11 +26,11 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoading, setIsLoading] = useState(false);
 
   // --- API Fetchers ---
-  const API_BASE_URL = "https://z6ogy2t70b.execute-api.sa-east-1.amazonaws.com";
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   const requestWithAuth = useCallback(async (endpoint: string, options: RequestInit = {}) => {
     if (!user || !user.token) return null;
-    
+
     const url = `${API_BASE_URL}${endpoint}`;
     const headers = {
       ...options.headers,
@@ -39,13 +39,17 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       const response = await fetch(url, { ...options, headers });
-      
+
       if (response.status === 503) {
         console.error(`Service Unavailable (503) at ${endpoint}. Check backend status.`);
         return null;
       }
 
       if (!response.ok) {
+        if (response.status === 401) {
+          console.warn("Sessão expirada ou não autorizada. Deslogando...");
+          logout();
+        }
         let errorMessage = `API Error (${response.status}) at ${endpoint}`;
         try {
           const errorData = await response.json();
@@ -59,7 +63,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // For DELETE or 204 No Content, response.json() might fail
       if (response.status === 204) return true;
-      
+
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         return await response.json();
@@ -69,7 +73,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error(`Request error at ${endpoint}:`, error);
       throw error;
     }
-  }, [user]);
+  }, [user, logout]);
 
   const fetchWithAuth = useCallback(async (endpoint: string) => {
     try {
@@ -81,7 +85,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchAccounts = useCallback(async () => {
     const data = await fetchWithAuth("/accounts");
-    const sanitized = Array.isArray(data) 
+    const sanitized = Array.isArray(data)
       ? data.map((acc: Account) => ({ ...acc, balance: Number(acc.balance) || 0 }))
       : [];
     setAccounts(sanitized);
@@ -89,7 +93,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchCreditCards = useCallback(async () => {
     const data = await fetchWithAuth("/cards");
-    const sanitized = Array.isArray(data) 
+    const sanitized = Array.isArray(data)
       ? data.map((card: CreditCard) => ({ ...card, limit: Number(card.limit) || 0 }))
       : [];
     setCreditCards(sanitized);
@@ -102,7 +106,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchCategories = useCallback(async () => {
     const data = await fetchWithAuth("/categories");
-    const sanitized = Array.isArray(data) 
+    const sanitized = Array.isArray(data)
       ? data.map((cat: Category) => ({ ...cat, monthlyLimit: Number(cat.monthlyLimit) || 0 }))
       : [];
     setCategories(sanitized);
@@ -110,7 +114,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchFixedExpenses = useCallback(async () => {
     const data = await fetchWithAuth("/fixed-expenses");
-    const sanitized = Array.isArray(data) 
+    const sanitized = Array.isArray(data)
       ? data.map((exp: FixedExpense) => ({ ...exp, amount: Number(exp.amount) || 0 }))
       : [];
     setFixedExpenses(sanitized);
@@ -119,7 +123,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchTransactions = useCallback(async () => {
     const data = await fetchWithAuth("/transactions");
     console.log("Transações recebidas do Backend:", data);
-    const sanitized = Array.isArray(data) 
+    const sanitized = Array.isArray(data)
       ? data.map((t: Transaction) => ({ ...t, amount: Number(t.amount) || 0 }))
       : [];
     setTransactions(sanitized);
@@ -433,7 +437,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
       // 1. Tentar localizar o responsável padrão
       // 2. Fallback: pegar o primeiro responsável da lista caso não exista um default
       const responsible = responsibles.find(r => r.isDefault) || responsibles[0];
-      
+
       if (!responsible) {
         alert("Nenhum responsável encontrado. Cadastre um responsável antes de pagar a fatura.");
         return;
@@ -455,7 +459,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({
           responsibleId: responsible.id
         }),
       });
-      
+
       await fetchTransactions();
       await fetchAccounts();
       alert("Fatura paga com sucesso!");
