@@ -1,9 +1,9 @@
-# 💰 Finanças App (Gestor Financeiro Pessoal)
+# 💰 Financeiro — Dashboard de Gestão
 
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
-![Tailwind](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)](https://vitejs.dev/)
 
 Um aplicativo moderno e responsivo para gestão financeira pessoal. Planejado para dar total controle sobre transações recorrentes, faturas de cartão de crédito e controle familiar de gastos.
 
@@ -50,5 +50,11 @@ Este projeto foi construído utilizando as ferramentas mais modernas do ecossist
 - **Gráficos e Componentes:** [Recharts](https://recharts.org/) & [Lucide React](https://lucide.dev/)
 - **Utilitários:** `date-fns` para manipulações de datas e `clsx`/`tailwind-merge` para classes condicionais.
 
+## 🤖 Desenvolvimento com IA
+
+Este repositório foi criado e desenvolvido integralmente por uma Inteligência Artificial (**Antigravity**, utilizando o modelo **Gemini 2.0 Flash** da equipe do Google DeepMind). 
+
+O projeto serve como um suporte de estudo e base para outros projetos do ecossistema, e por essa razão, a IA foi utilizada para acelerar o desenvolvimento, aplicar padrões modernos e estruturar a arquitetura de forma eficiente.
+
 ---
-Desenvolvido por **Henrique Ali**.
+Desenvolvido por [**Henrique Ali**](https://www.linkedin.com/in/henrique-ali) com auxílio de IA.
